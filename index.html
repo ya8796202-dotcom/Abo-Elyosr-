@@ -2,306 +2,326 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>🚗 محاكاة قيادة واقعية (Top‑down)</title>
+  <title>🚗 محاكاة قيادة ثلاثية الأبعاد — HTML فقط</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     :root {
-      --bg: #0f172a; --road: #1f2937; --lane: #e5e7eb; --text: #e5e7eb;
-      --accent: #0ea5e9; --grass1: #0b5d2a; --grass2: #0a4a22;
+      --primary:#0ea5e9; --accent:#22c55e; --bg:#0f172a; --card:#0b1220; --text:#e5e7eb;
     }
-    * { box-sizing: border-box; }
-    body { margin:0; font-family:"Cairo",system-ui; background:var(--bg); color:var(--text); }
-    header { padding:8px 16px; background:var(--accent); color:#071621; font-weight:800; }
-    .wrap { display:grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 46px); }
-    canvas { width:100%; height: calc(100vh - 46px); display:block; background:linear-gradient(180deg,var(--grass1),var(--grass2)); }
-    aside { background:#0a1220; border-left:1px solid #1f2937; padding:12px; }
-    .stat { background:#0b1220; border:1px solid #1f2937; border-radius:10px; padding:10px; margin-bottom:10px; }
-    .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center }
-    .btn { padding:8px 10px; border-radius:8px; border:none; font-weight:700; cursor:pointer; }
-    .btn-primary { background:var(--accent); color:#071621 }
-    .input { width:100%; padding:8px; border-radius:8px; border:1px solid #1f2937; background:#0b1220; color:var(--text) }
-    .hint { font-size:12px; opacity:0.8 }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Cairo",system-ui}
+    #hud{
+      position:fixed; top:12px; right:12px; background:rgba(2,6,23,.6);
+      backdrop-filter:blur(6px); border:1px solid #1f2937; padding:10px 12px; border-radius:12px;
+      display:flex; gap:16px; font-weight:800; z-index:10
+    }
+    #panel{
+      position:fixed; left:12px; top:12px; background:rgba(2,6,23,.6);
+      border:1px solid #1f2937; padding:10px; border-radius:12px; z-index:10; min-width:260px
+    }
+    .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .btn{padding:8px 10px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#071621}
+    .btn-accent{background:var(--accent);color:#071621}
+    .slider{width:100%}
+    #overlay{
+      position:fixed; inset:0; display:grid; place-items:center; z-index:20;
+      background:radial-gradient(1200px circle at center, rgba(14,165,233,0.1), transparent 50%);
+    }
+    .panel{
+      background:rgba(2,6,23,0.8); border:1px solid #1f2937; border-radius:16px; padding:18px; text-align:center; max-width:520px
+    }
+    .title{font-size:22px;font-weight:800;color:var(--primary);margin-bottom:8px}
+    canvas{display:block; width:100vw; height:100vh}
   </style>
 </head>
 <body>
-<header>🚗 محاكاة قيادة واقعية (Top‑down) — أسهم: يمين/يسار للتوجيه • ↑ للتسارع • ↓ للفرامل • مسافة لفرامل يد</header>
-
-<div class="wrap">
-  <canvas id="cv"></canvas>
-  <aside>
-    <div class="stat">
-      <div><strong>السرعة:</strong> <span id="spd">0</span> كم/س</div>
-      <div><strong>التروس:</strong> <span id="gear">N</span></div>
-      <div><strong>دورات المحرك:</strong> <span id="rpm">0</span> rpm</div>
-      <div><strong>انزلاق:</strong> <span id="slip">0</span></div>
-    </div>
-    <div class="stat">
-      <div class="row">
-        <button class="btn btn-primary" id="resetBtn">إعادة ضبط</button>
-        <button class="btn" id="pauseBtn">إيقاف/تشغيل</button>
-      </div>
-    </div>
-    <div class="stat">
-      <div><strong>إعدادات السيارة</strong></div>
-      <label>قوة المحرك (kN)
-        <input id="eng" type="range" min="2" max="10" step="0.5" value="6" class="input">
-      </label>
-      <label>معامل جر الإطارات
-        <input id="mu" type="range" min="0.6" max="1.4" step="0.05" value="1.0" class="input">
-      </label>
-      <label>فرامل يد (قوة)
-        <input id="ebr" type="range" min="0.5" max="2.0" step="0.1" value="1.0" class="input">
-      </label>
-      <div class="hint">ارفع معامل الجر للقبضة القوية، قلله لتنزلق أكتر.</div>
-    </div>
-    <div class="stat">
-      <strong>المفاتيح:</strong>
-      <div>↑ تسارع • ↓ فرامل • ←/→ توجيه • Space فرامل يد • P إيقاف مؤقت</div>
-    </div>
-  </aside>
+<div id="hud">
+  <div>السرعة: <span id="speed">0</span> كم/س</div>
+  <div>RPM: <span id="rpm">0</span></div>
+  <div>Gear: <span id="gear">N</span></div>
 </div>
 
-<script>
-const cv = document.getElementById("cv");
-const ctx = cv.getContext("2d");
-let W,H; function resize(){ W=cv.width=cv.clientWidth; H=cv.height=cv.clientHeight; } window.addEventListener("resize",resize); resize();
+<div id="panel">
+  <div style="font-weight:800;color:var(--primary);margin-bottom:6px">⚙️ إعدادات السيارة</div>
+  <div class="row">
+    <label style="flex:1">قوة المحرك <input id="eng" class="slider" type="range" min="2000" max="12000" step="500" value="7000"></label>
+    <label style="flex:1">جر الإطارات μ <input id="mu" class="slider" type="range" min="0.6" max="1.4" step="0.05" value="1.0"></label>
+    <label style="flex:1">فرامل <input id="brk" class="slider" type="range" min="4000" max="14000" step="500" value="9000"></label>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button class="btn btn-primary" id="resetBtn">إعادة الضبط</button>
+    <button class="btn btn-accent" id="toggleFPV">تبديل المنظور (داخلي/خارجي)</button>
+  </div>
+  <div style="font-size:12px;opacity:.8;margin-top:6px">
+    التحكم: W تسارع • S فرامل • A/D توجيه • Space فرامل يد • C تبديل المنظور • Shift غيار للأعلى • Ctrl غيار للأسفل
+  </div>
+</div>
 
-const ui = {
-  spd: document.getElementById("spd"),
-  gear: document.getElementById("gear"),
-  rpm: document.getElementById("rpm"),
-  slip: document.getElementById("slip"),
-  eng: document.getElementById("eng"),
-  mu:  document.getElementById("mu"),
-  ebr: document.getElementById("ebr")
+<div id="overlay">
+  <div class="panel">
+    <div class="title">محاكاة قيادة ثلاثية الأبعاد</div>
+    <div style="opacity:.85;margin-bottom:12px">اضغط "ابدأ" ثم استخدم لوحة المفاتيح للقيادة. المنظور الداخلي يظهر دركسيون يتحرك معك.</div>
+    <div class="row" style="justify-content:center">
+      <button class="btn btn-primary" id="startBtn">ابدأ</button>
+    </div>
+  </div>
+</div>
+
+<canvas id="scene"></canvas>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+const speedEl=document.getElementById("speed"), rpmEl=document.getElementById("rpm"), gearEl=document.getElementById("gear");
+const cv = document.getElementById("scene");
+const renderer = new THREE.WebGLRenderer({canvas: cv, antialias:true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87c5ff);
+
+// Sky light and sun
+const hemi = new THREE.HemisphereLight(0xffffff, 0x447755, 0.6);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(50,100,30);
+sun.castShadow = true;
+sun.shadow.mapSize.set(1024,1024);
+scene.add(sun);
+
+// Camera
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.set(0, 3.5, 8);
+scene.add(camera);
+const orbit = new THREE.OrbitControls(camera, renderer.domElement);
+orbit.target.set(0,1,0); orbit.update();
+
+// Ground (infinite road illusion)
+const groundGeo = new THREE.PlaneGeometry(500, 500);
+const groundMat = new THREE.MeshStandardMaterial({color:0x4a7a4a});
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI/2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// Road strip
+const roadW=8, roadL=200;
+const roadGeo = new THREE.PlaneGeometry(roadW, roadL);
+const roadMat = new THREE.MeshStandardMaterial({color:0x333333});
+const road = new THREE.Mesh(roadGeo, roadMat);
+road.rotation.x = -Math.PI/2;
+road.position.z = -roadL/2 + 5;
+scene.add(road);
+
+// Lane lines
+function makeLine(zOffset){
+  const line = new THREE.Mesh(new THREE.PlaneGeometry(0.15, roadL), new THREE.MeshStandardMaterial({color:0xffffff}));
+  line.rotation.x = -Math.PI/2;
+  line.position.set(0,0.01,zOffset);
+  return line;
+}
+scene.add(makeLine(road.position.z));
+const sideLineL = new THREE.Mesh(new THREE.PlaneGeometry(0.2, roadL), new THREE.MeshStandardMaterial({color:0xffffff}));
+sideLineL.rotation.x = -Math.PI/2; sideLineL.position.set(-roadW/2+0.2, 0.01, road.position.z);
+const sideLineR = sideLineL.clone(); sideLineR.position.x = roadW/2-0.2;
+scene.add(sideLineL, sideLineR);
+
+// Car model (simple but clean)
+const carGroup = new THREE.Group(); scene.add(carGroup);
+// Body
+const body = new THREE.Mesh(new THREE.BoxGeometry(1.8,0.6,4), new THREE.MeshStandardMaterial({color:0x0ea5e9, metalness:0.4, roughness:0.4}));
+body.castShadow = true; body.receiveShadow = true; carGroup.add(body);
+// Windows
+const glass = new THREE.Mesh(new THREE.BoxGeometry(1.6,0.4,1.6), new THREE.MeshPhysicalMaterial({color:0x66aacc, roughness:0, transmission:0.2, transparent:true, opacity:0.7}));
+glass.position.y = 0.5; glass.position.z = -0.5; carGroup.add(glass);
+// Wheels
+function wheel(){
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.25, 24), new THREE.MeshStandardMaterial({color:0x111111}));
+  t.rotation.z = Math.PI/2; t.castShadow = true; return t;
+}
+const wFL=wheel(), wFR=wheel(), wRL=wheel(), wRR=wheel();
+wFL.position.set(-0.9, -0.2, 1.5); wFR.position.set(0.9, -0.2, 1.5);
+wRL.position.set(-0.9, -0.2, -1.5); wRR.position.set(0.9, -0.2, -1.5);
+carGroup.add(wFL,wFR,wRL,wRR);
+
+// Interior steering wheel (for FPV)
+const steering = new THREE.Mesh(new THREE.TorusGeometry(0.22,0.05,16,32), new THREE.MeshStandardMaterial({color:0x222222}));
+steering.position.set(0.3, 0.6, 0.8);
+carGroup.add(steering);
+
+// FPV camera mount
+const fpv = new THREE.Object3D();
+fpv.position.set(0, 0.7, 0.6); // driver's head position
+carGroup.add(fpv);
+
+// Position car
+carGroup.position.set(0,0.35, 2);
+
+// Physics state
+const state = {
+  vx:0, vz:0, // world velocities
+  heading:0,
+  steer:0,
+  gear:0, // 0=N, 1..5
+  engineForce: 7000,
+  brakeForce: 9000,
+  mu: 1.0,
+  ebrake: false
 };
 
-const keys = { up:false, down:false, left:false, right:false, ebrake:false };
+// Inputs
+const keys = {w:false,s:false,a:false,d:false,space:false,shift:false,ctrl:false};
 window.addEventListener("keydown", e=>{
-  if(e.key==="ArrowUp") keys.up=true;
-  if(e.key==="ArrowDown") keys.down=true;
-  if(e.key==="ArrowLeft") keys.left=true;
-  if(e.key==="ArrowRight") keys.right=true;
-  if(e.code==="Space") keys.ebrake=true;
-  if(e.key.toLowerCase()==="p") paused=!paused;
+  const k = e.key.toLowerCase();
+  if(k==="w") keys.w=true;
+  if(k==="s") keys.s=true;
+  if(k==="a") keys.a=true;
+  if(k==="d") keys.d=true;
+  if(e.code==="Space") keys.space=true;
+  if(k==="shift") keys.shift=true;
+  if(k==="control") keys.ctrl=true;
+  if(k==="c"){ toggleView(); }
 });
 window.addEventListener("keyup", e=>{
-  if(e.key==="ArrowUp") keys.up=false;
-  if(e.key==="ArrowDown") keys.down=false;
-  if(e.key==="ArrowLeft") keys.left=false;
-  if(e.key==="ArrowRight") keys.right=false;
-  if(e.code==="Space") keys.ebrake=false;
+  const k = e.key.toLowerCase();
+  if(k==="w") keys.w=false;
+  if(k==="s") keys.s=false;
+  if(k==="a") keys.a=false;
+  if(k==="d") keys.d=false;
+  if(e.code==="Space") keys.space=false;
+  if(k==="shift") keys.shift=false;
+  if(k==="control") keys.ctrl=false;
 });
 
-// Track: multilane road
-function drawWorld() {
-  // road body
-  const rw = Math.min(W*0.6, 800);
-  const rx = (W - rw)/2;
-  ctx.fillStyle = "#1f2937";
-  ctx.fillRect(rx, 0, rw, H);
-  // shoulder
-  ctx.fillStyle = "#111827";
-  ctx.fillRect(rx-20,0,20,H);
-  ctx.fillRect(rx+rw,0,20,H);
-  // lanes
-  ctx.strokeStyle = "#e5e7eb"; ctx.lineWidth = 4; ctx.setLineDash([24,24]);
-  for(let i=1;i<4;i++){
-    const lx = rx + (rw/4)*i;
-    ctx.beginPath(); ctx.moveTo(lx,0); ctx.lineTo(lx,H); ctx.stroke();
-  }
-  ctx.setLineDash([]);
+// Basic drivetrain
+function setGear(delta){
+  state.gear = Math.max(0, Math.min(5, state.gear + delta));
 }
 
-// Car model (bicycle model with tire friction)
-const car = {
-  x: W*0.5, y: H*0.75, // position
-  vx:0, vy:0, // velocity in world
-  heading: -Math.PI/2, // pointing up
-  yawRate: 0,
-  mass: 1200, // kg
-  length: 2.6, // m (wheelbase)
-  width: 1.8,
-  // tire params
-  mu: 1.0,  // grip (updated by UI)
-  Cf: 60000, // front cornering stiffness
-  Cr: 60000, // rear cornering stiffness
-  // engine/brake
-  engineForce: 6000, // N (updated by UI)
-  brakeForce: 8000,  // N
-  ebrakeFactor: 1.0, // rear brake multiplier (updated)
+// Physics step
+function clamp(v,min,max){return Math.max(min, Math.min(max, v));}
+function step(dt){
   // steering
-  steer: 0,
-  maxSteer: 0.5, // rad ~ 28.6 deg
-  steerRate: 1.8, // rad/s
-};
+  const steerTarget = (keys.a?-0.5:0) + (keys.d?0.5:0);
+  state.steer += clamp(steerTarget - state.steer, -1.8*dt, 1.8*dt);
 
-let paused = false;
+  // gear
+  if(keys.shift){ setGear(1); keys.shift=false; }
+  if(keys.ctrl){ setGear(-1); keys.ctrl=false; }
 
-// Helpers
-function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
+  // longitudinal
+  const forward = new THREE.Vector2(Math.sin(state.heading), Math.cos(state.heading)); // z forward
+  const vel = new THREE.Vector2(state.vx, state.vz);
+  const ux = vel.dot(forward); // forward component
+  const uy = vel.dot(new THREE.Vector2(forward.y, -forward.x)); // lateral component
 
-// Physics update
-function step(dt) {
-  // Inputs
-  const steerTarget =
-    (keys.left? -car.maxSteer:0) + (keys.right? car.maxSteer:0);
-  car.steer += clamp(steerTarget - car.steer, -car.steerRate*dt, car.steerRate*dt);
+  const throttle = keys.w ? 1 : 0;
+  const brake = keys.s ? 1 : 0;
+  const ebr = keys.space ? 1 : 0;
 
-  const throttle = keys.up ? 1 : 0;
-  const brake    = keys.down ? 1 : 0;
-  const ebr      = keys.ebrake ? car.ebrakeFactor : 0;
+  const gearMul = state.gear===0?0 : 0.8 + 0.15*state.gear; // rough gear torque scaling
+  const F_engine = throttle * state.engineForce * gearMul;
+  const F_brake  = brake * state.brakeForce;
+  const F_drag   = 0.35 * ux*ux * Math.sign(ux); // air drag
+  const F_roll   = 40 * Math.sign(ux);           // rolling resistance
+  const Fx = F_engine - F_brake*Math.sign(ux) - F_drag - F_roll - ebr*state.brakeForce*0.3*Math.sign(ux);
 
-  // Transform velocities to car local frame
-  const cosH = Math.cos(car.heading), sinH = Math.sin(car.heading);
-  const ux =  cosH*car.vx + sinH*car.vy; // longitudinal
-  const uy = -sinH*car.vx + cosH*car.vy; // lateral
+  // lateral grip
+  const F_lat_max = state.mu * 9.81 * 1200 * 0.7; // simple
+  let F_lat = -uy * 2500; // linear cornering stiffness
+  F_lat = clamp(F_lat, -F_lat_max*(1-0.5*ebr), F_lat_max*(1-0.5*ebr));
 
-  // Longitudinal dynamics
-  const F_engine = throttle * car.engineForce;
-  const F_brake  = brake * car.brakeForce;
-  const F_ebrake = ebr * car.brakeForce * 0.6; // rear bias
-  const sign = Math.sign(ux);
-  const F_drag  = 0.5 * 1.2 * 0.3 * ux*ux * sign; // air drag ~rho*Cd*A*v^2
-  const F_roll  = 50 * sign; // rolling resistance
-  const Fx = F_engine - F_brake*sign - F_drag - F_roll - F_ebrake*sign;
+  // accelerations in local frame
+  const ax = Fx / 1200 + uy * 0.0; // ignore yaw coupling for simplicity
+  const ay = F_lat / 1200;
 
-  // Lateral tire forces (pacejka-lite: linear up to grip limit)
-  const a = car.length; // wheelbase
-  const beta = Math.atan2(uy, Math.max(0.1, Math.abs(ux))) // slip angle approx
-  const yaw = car.yawRate;
-
-  const v = Math.hypot(ux, uy);
-  const frontSlip = beta + yaw*a/2 / Math.max(v,0.1) - car.steer;
-  const rearSlip  = beta - yaw*a/2 / Math.max(v,0.1);
-
-  const Fyf_lin = -car.Cf * frontSlip;
-  const Fyr_lin = -car.Cr * rearSlip;
-
-  const Fmax = car.mu * car.mass * 9.81 / 2; // per axle
-  const Fyf = clamp(Fyf_lin, -Fmax, Fmax);
-  const Fyr = clamp(Fyr_lin, -Fmax, Fmax);
-
-  // Reduce rear grip on ebrake to induce oversteer
-  const Fyr_eff = Fyr * (1 - 0.5*ebr);
-
-  // Acceleration in local frame
-  const ax = Fx / car.mass + uy*yaw;
-  const ay = (Fyf + Fyr_eff) / car.mass - ux*yaw;
-
-  // Yaw dynamics (simplified)
-  const Iz = 0.5*car.mass* (car.length*car.length/12); // rough
-  const Mz = (Fyf * (a/2)) - (Fyr_eff * (a/2));
-  const yawAcc = Mz / Math.max(Iz,1);
-
-  // Integrate local velocities
+  // integrate local velocities
   const ux2 = ux + ax*dt;
   const uy2 = uy + ay*dt;
 
-  // Back to world frame
-  car.vx =  cosH*ux2 - sinH*uy2;
-  car.vy =  sinH*ux2 + cosH*uy2;
+  // back to world
+  const right = new THREE.Vector2(forward.y, -forward.x);
+  const worldVel = new THREE.Vector2().addScaledVector(forward, ux2).addScaledVector(right, uy2);
+  state.vx = worldVel.x; state.vz = worldVel.y;
 
-  // Integrate position and yaw
-  car.x += car.vx*dt;
-  car.y += car.vy*dt;
-  car.yawRate += yawAcc*dt;
-  car.heading += car.yawRate*dt;
+  // position
+  carGroup.position.x += state.vx*dt;
+  carGroup.position.z += state.vz*dt;
 
-  // Road limits (keep inside road)
-  const rw = Math.min(W*0.6, 800);
-  const rx = (W - rw)/2;
-  const laneL = rx+10, laneR = rx+rw-10;
-  car.x = clamp(car.x, laneL, laneR);
+  // heading/yaw from steering and forward speed
+  const yawRate = state.steer * clamp(ux2, -15, 15) * 0.08;
+  state.heading += yawRate*dt;
+  carGroup.rotation.y = state.heading;
 
-  // UI updates
-  const speedMS = Math.hypot(car.vx, car.vy);
-  ui.spd.textContent = Math.round(speedMS*3.6);
-  // Simple gear display based on speed
-  const gear = speedMS<2 ? "N" : speedMS<10 ? "1" : speedMS<20 ? "2" : speedMS<35 ? "3" : speedMS<55 ? "4" : "5";
-  ui.gear.textContent = gear;
-  ui.rpm.textContent  = Math.round(1000 + speedMS*120);
-  ui.slip.textContent = (Math.abs(frontSlip)+Math.abs(rearSlip)).toFixed(2);
+  // wheel visuals
+  wFL.rotation.y = state.steer; wFR.rotation.y = state.steer;
+  const wheelSpin = ux2 * 5;
+  [wFL,wFR,wRL,wRR].forEach(w=>w.rotation.x += wheelSpin*dt);
+
+  // HUD
+  const speedMS = Math.hypot(state.vx, state.vz);
+  speedEl.textContent = Math.round(speedMS*3.6);
+  rpmEl.textContent = Math.round(800 + throttle*3000 + speedMS*120);
+  gearEl.textContent = state.gear===0?'N':state.gear;
 }
 
-// Car drawing with skidmarks
-const skidmarks = [];
-function drawCar() {
-  // Skidmarks intensity from slip
-  const speed = Math.hypot(car.vx, car.vy);
-  const slipIntensity = clamp(speed>2 ? Math.min(1, parseFloat(ui.slip.textContent)/1.2) : 0, 0, 1);
-  const lw = 6*slipIntensity;
-  if (lw>0.2){
-    skidmarks.push({ x:car.x, y:car.y, heading:car.heading, w:lw, life: 1.0 });
-    if (skidmarks.length>800) skidmarks.shift();
+// Camera views
+let fpvMode = false;
+function applyCamera(){
+  if(fpvMode){
+    orbit.enabled = false;
+    camera.position.copy(fpv.getWorldPosition(new THREE.Vector3()));
+    camera.rotation.copy(carGroup.rotation);
+    camera.translateZ(-0.1);
+    camera.translateY(0.15);
+  }else{
+    orbit.enabled = true;
   }
-  // Draw skidmarks fading
-  for(let i=0;i<skidmarks.length;i++){
-    const s = skidmarks[i];
-    ctx.save();
-    ctx.translate(s.x, s.y);
-    ctx.rotate(s.heading);
-    ctx.globalAlpha = s.life*0.5;
-    ctx.fillStyle = "#0a0a0a";
-    ctx.fillRect(-car.width*10, 8, car.width*20, s.w);
-    ctx.fillRect(-car.width*10,-8, car.width*20, s.w);
-    ctx.restore();
-    s.life = Math.max(0, s.life - 0.01);
-  }
+}
+function toggleView(){ fpvMode = !fpvMode; applyCamera(); }
 
-  // Car body
-  ctx.save();
-  ctx.translate(car.x, car.y);
-  ctx.rotate(car.heading);
-  const wpx = car.width*30, lpx = car.length*40;
-  // body
-  const grd = ctx.createLinearGradient(-lpx/2,0,lpx/2,0);
-  grd.addColorStop(0,"#0ea5e9"); grd.addColorStop(1,"#22c55e");
-  ctx.fillStyle = grd;
-  ctx.fillRect(-lpx/2, -wpx/2, lpx, wpx);
-  // windows
-  ctx.fillStyle = "rgba(255,255,255,0.15)";
-  ctx.fillRect(-lpx*0.1, -wpx*0.35, lpx*0.4, wpx*0.7);
-  // wheels
-  ctx.fillStyle = "#0f0f0f";
-  const wh = wpx*0.18, ww = lpx*0.16;
-  ctx.fillRect(-lpx/2+10, -wpx/2-6, ww, wh);
-  ctx.fillRect(-lpx/2+10,  wpx/2- wh+6, ww, wh);
-  ctx.fillRect( lpx/2-ww-10, -wpx/2-6, ww, wh);
-  ctx.fillRect( lpx/2-ww-10,  wpx/2- wh+6, ww, wh);
-  // front wheel steer indicator
-  ctx.fillStyle = "#e5e7eb";
-  ctx.fillRect(lpx/2-ww-10, -wpx/2-12, 8*Math.sign(car.steer), 4);
-  ctx.restore();
+// Animate road for infinity feel
+function animateRoad(){
+  road.position.z = carGroup.position.z - roadL/2 + 5;
+  sideLineL.position.z = road.position.z;
+  sideLineR.position.z = road.position.z;
 }
 
-// Main loop
-let last = performance.now();
+// UI bindings
+const overlay = document.getElementById("overlay");
+document.getElementById("startBtn").addEventListener("click", ()=> overlay.style.display="none");
+document.getElementById("toggleFPV").addEventListener("click", toggleView);
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  state.vx=0; state.vz=0; state.heading=0; state.steer=0;
+  carGroup.position.set(0,0.35,2); carGroup.rotation.y=0;
+});
+document.getElementById("eng").addEventListener("input", e=> state.engineForce=parseFloat(e.target.value));
+document.getElementById("mu").addEventListener("input", e=> state.mu=parseFloat(e.target.value));
+document.getElementById("brk").addEventListener("input", e=> state.brakeForce=parseFloat(e.target.value));
+
+// Gear quick defaults
+state.gear=1;
+
+// Loop
+let last=performance.now();
 function loop(ts){
-  const dt = Math.min(0.033, (ts - last)/1000); last = ts;
-  ctx.clearRect(0,0,W,H);
-  drawWorld();
-  if (!paused) step(dt);
-  drawCar();
+  const dt = Math.min(0.033, (ts-last)/1000); last=ts;
+  step(dt);
+  animateRoad();
+  applyCamera();
+  renderer.render(scene, camera);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 
-// UI controls
-document.getElementById("resetBtn").addEventListener("click", ()=>{
-  car.x = W*0.5; car.y = H*0.75;
-  car.vx=0; car.vy=0; car.heading=-Math.PI/2; car.yawRate=0; car.steer=0;
-  skidmarks.length=0;
+// Resize
+window.addEventListener("resize", ()=>{
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
 });
-document.getElementById("pauseBtn").addEventListener("click", ()=> paused=!paused);
-ui.eng.addEventListener("input", ()=> car.engineForce = parseFloat(ui.eng.value)*1000);
-ui.mu.addEventListener("input", ()=> car.mu = parseFloat(ui.mu.value));
-ui.ebr.addEventListener("input", ()=> car.ebrakeFactor = parseFloat(ui.ebr.value));
-
-// Initial apply
-car.engineForce = parseFloat(ui.eng.value)*1000;
-car.mu = parseFloat(ui.mu.value);
-car.ebrakeFactor = parseFloat(ui.ebr.value);
 </script>
 </body>
 </html>

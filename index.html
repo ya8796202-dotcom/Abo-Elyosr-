@@ -2,253 +2,118 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>🚗 لعبة قيادة واقعية</title>
+  <title>🚗 منصّة محاكاة القيادة</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { margin:0; background:#111; overflow:hidden; }
-    canvas { display:block; margin:0 auto; background:#333; }
-    #overlay {
-      position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
-      background:rgba(0,0,0,0.7); color:#fff; font-family:"Cairo",sans-serif; z-index:10;
+    :root {
+      --bg: #0f172a; --card: #0b1220; --text: #e5e7eb; --muted:#9ca3af;
+      --primary:#0ea5e9; --accent:#22c55e; --border:#1f2937;
     }
-    #overlay button {
-      padding:10px 20px; font-size:20px; border:none; border-radius:8px;
-      background:#0ea5e9; color:#000; cursor:pointer; font-weight:bold;
+    * { box-sizing: border-box }
+    body { margin:0; font-family: "Cairo", system-ui; background: var(--bg); color: var(--text) }
+    header {
+      background: linear-gradient(90deg, #0ea5e9, #22c55e);
+      color:#08101a; padding: 16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap;
     }
-    #hud {
-      position:fixed; top:10px; left:10px; color:#fff; font-family:"Cairo",sans-serif;
-      background:rgba(0,0,0,0.5); padding:8px 12px; border-radius:8px;
+    header h1 { margin:0; font-size: 22px; font-weight:900 }
+    header .sub { font-size:13px; opacity:.8 }
+    .container { max-width: 1100px; margin: 20px auto; padding: 0 16px }
+    .grid { display:grid; grid-template-columns: 1fr 360px; gap: 16px }
+    @media (max-width: 960px) { .grid { grid-template-columns: 1fr } }
+    .card {
+      background: var(--card);
+      border:1px solid var(--border); border-radius: 14px; overflow:hidden;
+      box-shadow: 0 8px 30px rgba(0,0,0,.35);
     }
+    .card header { background: transparent; color: var(--text); padding: 12px 16px; border-bottom:1px solid var(--border) }
+    .card h2 { margin:0; font-size: 18px; color: var(--primary) }
+    .card .body { padding: 14px }
+    .btn {
+      display:inline-block; padding:10px 12px; border-radius:10px; border:none; cursor:pointer; font-weight:800;
+      background: var(--primary); color:#08101a; text-decoration:none; transition: transform .08s ease;
+    }
+    .btn:hover { transform: translateY(-1px) }
+    .btn.accent { background: var(--accent) }
+    .list { display:grid; gap:10px }
+    .item { padding:10px; border:1px solid var(--border); border-radius:12px; background:#091021 }
+    .item .title { font-weight:800; color: var(--primary) }
+    .item .desc { font-size:13px; color: var(--muted); margin-top:6px }
+    iframe {
+      width: 100%; height: 70vh; border:0; background:#000;
+    }
+    .note { font-size:12px; color: var(--muted); margin-top:8px }
+    footer { text-align:center; color: var(--muted); padding: 20px 0 }
   </style>
 </head>
 <body>
-<div id="overlay">
-  <div>
-    <h1>🚗 لعبة قيادة واقعية</h1>
-    <p>اضغط على زر البدء للقيادة</p>
-    <button id="startBtn">ابدأ</button>
+  <header>
+    <div>
+      <h1>🚗 منصّة محاكاة القيادة الجاهزة</h1>
+      <div class="sub">اختر لعبتك وابدأ القيادة فورًا — روابط موثوقة تعمل في المتصفح</div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap">
+      <a class="btn" href="https://ar.crazygames.com/game/realdrive-feel-the-real-drive" target="_blank" rel="noopener">فتح RealDrive</a>
+      <a class="btn accent" href="https://yandex.com/games/ar/app/258100" target="_blank" rel="noopener">فتح Ultimate Car Driving</a>
+      <a class="btn" href="https://www.gamesy.com/ar/game/real-driving-simulator-ar/" target="_blank" rel="noopener">فتح Real Driving Simulator</a>
+    </div>
+  </header>
+
+  <div class="container grid">
+    <div class="card">
+      <header>
+        <h2>تشغيل مباشر داخل الموقع</h2>
+      </header>
+      <div class="body">
+        <iframe
+          title="RealDrive Embed"
+          src="https://ar.crazygames.com/game/realdrive-feel-the-real-drive"
+          allow="gamepad *; fullscreen; autoplay"
+          sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups"
+        ></iframe>
+        <div class="note">لو الإطار المضمّن ما اشتغل، استخدم الأزرار بالأعلى لفتح اللعبة في تبويب جديد.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <header>
+        <h2>البدائل والميزات</h2>
+      </header>
+      <div class="body">
+        <div class="list">
+          <div class="item">
+            <div class="title">RealDrive — Feel the Real Drive</div>
+            <div class="desc">محاكاة قيادة ثلاثية الأبعاد بعالم مفتوح وفيزياء واقعية تعمل عبر WebGL داخل المتصفح.</div>
+            <div style="margin-top:8px">
+              <a class="btn" href="https://ar.crazygames.com/game/realdrive-feel-the-real-drive" target="_blank" rel="noopener">تشغيل</a>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="title">Ultimate Car Driving Simulator</div>
+            <div class="desc">تركيز على واقعية الفيزياء والتخصيص داخل عالم مفتوح—يدعم اللعب داخل المتصفح.</div>
+            <div style="margin-top:8px">
+              <a class="btn accent" href="https://yandex.com/games/ar/app/258100" target="_blank" rel="noopener">تشغيل</a>
+            </div>
+          </div>
+
+          <div class="item">
+            <div class="title">Real Driving Simulator</div>
+            <div class="desc">طرق ومدن ومسارات متنوعة مع إحساس واقعي خلف المقود وتجربة سباق ممتعة.</div>
+            <div style="margin-top:8px">
+              <a class="btn" href="https://www.gamesy.com/ar/game/real-driving-simulator-ar/" target="_blank" rel="noopener">تشغيل</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="note" style="margin-top:10px">
+          تلميح: بعض الألعاب تطلب فتحها في نافذة مستقلة أو السماح بـ Gamepad. لو واجهت مشكلة، افتحها من الأزرار بالأعلى.
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-<div id="hud">النقاط: <span id="score">0</span></div>
-<canvas id="game" width="400" height="600"></canvas>
 
-<script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-const overlay = document.getElementById("overlay");
-const scoreEl = document.getElementById("score");
-
-let roadWidth = 200;
-let player = { x: canvas.width/2-20, y: 500, w: 40, h: 80, color: "cyan" };
-let enemies = [];
-let score = 0;
-let speed = 3;
-let gameOver = false;
-let started = false;
-
-// رسم الطريق
-function drawRoad() {
-  ctx.fillStyle = "#555";
-  ctx.fillRect(canvas.width/2-roadWidth/2, 0, roadWidth, canvas.height);
-
-  ctx.strokeStyle = "white";
-  ctx.lineWidth = 4;
-  ctx.setLineDash([20,20]);
-  ctx.beginPath();
-  ctx.moveTo(canvas.width/2, 0);
-  ctx.lineTo(canvas.width/2, canvas.height);
-  ctx.stroke();
-  ctx.setLineDash([]);
-}
-
-// رسم السيارة
-function drawCar(car) {
-  ctx.fillStyle = car.color;
-  ctx.fillRect(car.x, car.y, car.w, car.h);
-}
-
-// تحديث الأعداء
-function updateEnemies() {
-  enemies.forEach((e,i) => {
-    e.y += speed;
-    if (e.y > canvas.height) {
-      enemies.splice(i,1);
-      score += 10;
-    }
-    // تصادم
-    if (e.x < player.x+player.w && e.x+e.w > player.x &&
-        e.y < player.y+player.h && e.y+e.h > player.y) {
-      gameOver = true;
-    }
-  });
-}
-
-// توليد أعداء
-function spawnEnemy() {
-  let lane = Math.random() < 0.5 ? -50 : 50;
-  let x = canvas.width/2 + lane - 20;
-  enemies.push({ x, y: -100, w: 40, h: 80, color: "red" });
-}
-
-// رسم النص
-function drawText() {
-  ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText("النقاط: " + score, 10, 30);
-  if (gameOver) {
-    ctx.fillStyle = "yellow";
-    ctx.font = "30px Arial";
-    ctx.fillText("انتهت اللعبة!", 120, 300);
-  }
-}
-
-// حلقة اللعبة
-function loop() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  drawRoad();
-  drawCar(player);
-  enemies.forEach(drawCar);
-  if (started && !gameOver) {
-    updateEnemies();
-    scoreEl.textContent = score;
-  }
-  drawText();
-  requestAnimationFrame(loop);
-}
-loop();
-
-// تحكم اللاعب
-window.addEventListener("keydown", e => {
-  if (!started || gameOver) return;
-  if (e.key === "ArrowLeft" && player.x > canvas.width/2-roadWidth/2) player.x -= 20;
-  if (e.key === "ArrowRight" && player.x+player.w < canvas.width/2+roadWidth/2) player.x += 20;
-});
-
-// توليد أعداء كل فترة
-setInterval(() => {
-  if (started && !gameOver) spawnEnemy();
-}, 1500);
-
-// زيادة السرعة تدريجيًا
-setInterval(() => {
-  if (started && !gameOver) speed += 0.2;
-}, 3000);
-
-// زر البدء
-document.getElementById("startBtn").addEventListener("click", () => {
-  overlay.style.display = "none";
-  started = true;
-  score = 0;
-  speed = 3;
-  enemies = [];
-  gameOver = false;
-  player.x = canvas.width/2-20;
-});
-</script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>🚗 قيادة من داخل السيارة</title>
-  <style>
-    body { margin:0; background:#111; overflow:hidden; }
-    canvas { display:block; width:100vw; height:100vh; }
-    #hud {
-      position:fixed; top:10px; left:10px; color:#fff; font-family:"Cairo",sans-serif;
-      background:rgba(0,0,0,0.5); padding:8px 12px; border-radius:8px;
-    }
-  </style>
-</head>
-<body>
-<div id="hud">السرعة: <span id="speed">0</span> كم/س</div>
-<canvas id="scene"></canvas>
-
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script>
-const speedEl=document.getElementById("speed");
-const cv=document.getElementById("scene");
-const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-renderer.setSize(window.innerWidth,window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-renderer.shadowMap.enabled=true;
-
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x87c5ff);
-
-// إضاءة
-const hemi=new THREE.HemisphereLight(0xffffff,0x444444,0.6);
-scene.add(hemi);
-const sun=new THREE.DirectionalLight(0xffffff,0.9);
-sun.position.set(50,100,30);
-sun.castShadow=true;
-scene.add(sun);
-
-// كاميرا داخلية
-const camera=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
-camera.position.set(0,1.2,0.5); // مكان السائق
-scene.add(camera);
-
-// أرضية وطريق
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(500,500),new THREE.MeshStandardMaterial({color:0x4a7a4a}));
-ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
-
-const road=new THREE.Mesh(new THREE.PlaneGeometry(8,200),new THREE.MeshStandardMaterial({color:0x333333}));
-road.rotation.x=-Math.PI/2; road.position.z=-100; scene.add(road);
-
-// دركسيون
-const steering=new THREE.Mesh(new THREE.TorusGeometry(0.25,0.05,16,32),new THREE.MeshStandardMaterial({color:0x222222}));
-steering.position.set(0.3,0.9,0.8);
-scene.add(steering);
-
-// حالة السيارة
-const state={vx:0,vz:0,heading:0,steer:0};
-
-// مدخلات
-const keys={w:false,s:false,a:false,d:false};
-window.addEventListener("keydown",e=>{
-  if(e.key==="w")keys.w=true;
-  if(e.key==="s")keys.s=true;
-  if(e.key==="a")keys.a=true;
-  if(e.key==="d")keys.d=true;
-});
-window.addEventListener("keyup",e=>{
-  if(e.key==="w")keys.w=false;
-  if(e.key==="s")keys.s=false;
-  if(e.key==="a")keys.a=false;
-  if(e.key==="d")keys.d=false;
-});
-
-// فيزياء مبسطة
-function step(dt){
-  if(keys.w) state.vz-=20*dt;
-  if(keys.s) state.vz+=20*dt;
-  if(keys.a) state.steer=Math.max(state.steer-1*dt,-0.5);
-  if(keys.d) state.steer=Math.min(state.steer+1*dt,0.5);
-  state.heading+=state.steer*dt*2;
-  camera.position.z+=state.vz*dt;
-  camera.rotation.y=state.heading;
-  steering.rotation.z=state.steer*2; // حركة الدركسيون
-  const speed=Math.abs(state.vz*3.6);
-  speedEl.textContent=Math.round(speed);
-}
-
-// حلقة اللعبة
-let last=performance.now();
-function loop(ts){
-  const dt=(ts-last)/1000; last=ts;
-  step(dt);
-  renderer.render(scene,camera);
-  requestAnimationFrame(loop);
-}
-requestAnimationFrame(loop);
-
-// Resize
-window.addEventListener("resize",()=>{
-  renderer.setSize(window.innerWidth,window.innerHeight);
-  camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix();
-});
-</script>
+  <footer>
+    جاهز للدمج في موقعك — غيّر الألوان من :root واحفظ الصفحة باسم index.html
+  </footer>
 </body>
 </html>

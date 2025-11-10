@@ -44,8 +44,56 @@ void loop(){
 }</textarea>
 
   <div id="console">💻 Serial Monitor جاهز...</div>
+<div class="toolbar">
+  <button class="btn accent" onclick="openSerial()">🔌 فتح المنفذ</button>
+  <button class="btn muted" onclick="closeSerial()">❌ إغلاق المنفذ</button>
+  <input id="serialInput" placeholder="اكتب أمر وأرسله للـ Arduino" style="flex:1;padding:6px;border-radius:6px;border:none">
+  <button class="btn upload" onclick="sendSerial()">➡️ إرسال</button>
+</div>
 
 <script>
+  let port, reader, inputDone, outputDone, inputStream, outputStream;
+
+async function openSerial(){
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+    log("✅ تم فتح المنفذ");
+    listenToPort();
+  } catch(e){
+    log("❌ خطأ في فتح المنفذ: "+e);
+  }
+}
+
+async function listenToPort(){
+  const decoder = new TextDecoderStream();
+  inputDone = port.readable.pipeTo(decoder.writable);
+  inputStream = decoder.readable;
+  reader = inputStream.getReader();
+
+  while(true){
+    const { value, done } = await reader.read();
+    if(done) break;
+    if(value) log("📥 "+value);
+  }
+}
+
+async function sendSerial(){
+  if(!port) { log("⚠️ افتح المنفذ أولاً"); return; }
+  const text = document.getElementById("serialInput").value;
+  const encoder = new TextEncoder();
+  const writer = port.writable.getWriter();
+  await writer.write(encoder.encode(text+"\n"));
+  writer.releaseLock();
+  log("➡️ أُرسل: "+text);
+}
+
+async function closeSerial(){
+  if(reader){ await reader.cancel(); await inputDone.catch(()=>{}); reader=null; }
+  if(port){ await port.close(); port=null; }
+  log("❌ تم إغلاق المنفذ");
+}
+
   // تفعيل CodeMirror
   var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     lineNumbers: true,

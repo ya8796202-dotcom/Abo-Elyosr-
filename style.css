@@ -1,0 +1,42 @@
+/* تنسيق عام للأزرار */
+.btn {
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+/* للشاشات الصغيرة (موبايل أقل من 600px) */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .toolbar {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .btn {
+    width: 100%; /* الأزرار تاخد عرض الشاشة */
+    font-size: 16px;
+  }
+
+  #editor {
+    height: 40vh; /* المحرر أصغر شوية */
+  }
+
+  #console {
+    height: 25vh; /* السيريال مونيتور أكبر */
+  }
+
+  #serialInput {
+    width: 100%;
+    margin-top: 6px;
+  }
+}
+
+
+@media (prefers-color-scheme: light) {
+  body { background: #f9fafb; color: #111; }
+  #console { background: #fff; color: #111; }
+}

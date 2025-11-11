@@ -42,3 +42,23 @@
 }
 
 
+#bot-widget {
+  position: fixed;
+  bottom: 60px; /* فوق الزرار */
+  right: 20px;
+  z-index: 1000; /* ترتيب أقل من الزرار */
+}
+
+#toggle-bot {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  z-index: 2000; /* ترتيب أعلى عشان يظهر فوق */
+}

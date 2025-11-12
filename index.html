@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+  <script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+      .then(() => console.log("Service Worker Registered"));
+  }
+</script>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#2196f3">
   <meta name="google-site-verification" content="JUyevI_fBfJQexXFsG9KVciVHKUPSSuCpFH0rmPlycc" />
@@ -994,15 +1000,4 @@ document.getElementById("toggle-bot").addEventListener("click", () => {
 #toggle-bot:hover {
   background: #e68900;
 }
-</style>
 
-
-
-
-
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js")
-      .then(() => console.log("Service Worker Registered"));
-  }
-</script>

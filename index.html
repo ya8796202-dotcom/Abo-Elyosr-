@@ -63,7 +63,7 @@
 <section class="hero-intro">
   <div class="video-wrapper">
     <iframe
-      src="https://www.youtube.com/embed/VIDEO_ID?autoplay=1&mute=1&loop=1&playlist=VIDEO_ID&controls=0&rel=0&modestbranding=1"
+      "
       title="Intro Video"
       frameborder="0"
       allow="autoplay; encrypted-media"
@@ -72,11 +72,24 @@
     </iframe>
   </div>
 
-  <!-- طبقة نص وزر فوق الفيديو -->
+  <!-- قسم الفيديو التعريفي -->
+<section class="hero-intro">
+  <div class="video-wrapper zoom-video">
+    <iframe
+      src="https://www.youtube.com/embed/jGdhlQvFvt8?autoplay=1&mute=1&loop=1&playlist=jGdhlQvFvt8&controls=0&rel=0&modestbranding=1"
+      title="Intro Video"
+      frameborder="0"
+      allow="autoplay; encrypted-media"
+      allowfullscreen
+      loading="lazy">
+    </iframe>
+  </div>
+
+  <!-- Overlay نص ترحيبي فوق الفيديو -->
   <div class="hero-overlay">
-    <h1 class="hero-title">منصة أردوينو التفاعلية</h1>
-    <p class="hero-subtitle">اكتب الكود، جرّب الحساسات، وشاهد النتيجة فورًا.</p>
-    <div class="hero-actions">
+    <h1 class="hero-title fade-in">منصة أردوينو التفاعلية</h1>
+    <p class="hero-subtitle fade-in">جرّب الأكواد وشاهد النتيجة مباشرة.</p>
+    <div class="hero-actions fade-in">
       <a href="#start" class="btn-primary">ابدأ الآن</a>
       <a href="#docs" class="btn-secondary">الدليل السريع</a>
     </div>
@@ -87,20 +100,16 @@
   :root{
     --overlay-bg: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.25) 100%);
     --text-color: #ffffff;
-    --accent: #00d1b2; /* عدّل اللون لهوية ياسر */
+    --accent: #00d1b2;
   }
 
-  /* حاوية بالنسبة لتناسب العرض */
   .hero-intro{
     position: relative;
     width: 100%;
-    overflow: hidden;
-    /* نسبة أبعاد 16:9 عبر تقنية padding-bottom */
-    aspect-ratio: 16 / 9; /* مدعومة حديثًا؛ إن لم تعمل استخدم padding-bottom */
+    aspect-ratio: 16 / 9;
     background: #000;
+    overflow: hidden;
   }
-
-  /* بديل في حال المتصفح لا يدعم aspect-ratio */
   @supports not (aspect-ratio: 16 / 9){
     .hero-intro{ padding-bottom: 56.25%; }
   }
@@ -114,7 +123,6 @@
     height: 100%;
   }
 
-  /* طبقة Overlay */
   .hero-overlay{
     position: absolute;
     inset: 0;
@@ -130,7 +138,6 @@
     font-size: clamp(1.6rem, 2.5vw, 3rem);
     margin: 0 0 .5rem;
     font-weight: 800;
-    letter-spacing: .5px;
   }
   .hero-subtitle{
     font-size: clamp(1rem, 1.4vw, 1.3rem);
@@ -148,14 +155,12 @@
     text-decoration: none;
     padding: .75rem 1.25rem;
     border-radius: .6rem;
-    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
     font-weight: 700;
-    display: inline-block;
+    transition: transform .15s ease, background .2s ease;
   }
   .btn-primary{
     background: var(--accent);
     color: #081b1f;
-    box-shadow: 0 6px 18px rgba(0, 209, 178, .35);
   }
   .btn-primary:hover{ transform: translateY(-2px); }
 
@@ -169,11 +174,26 @@
     transform: translateY(-2px);
   }
 
-  /* تحسينات للجوال */
-  @media (max-width: 600px){
-    .hero-overlay{ padding: 1.25rem; }
-    .hero-actions{ gap: .6rem; }
-    .btn-primary, .btn-secondary{ padding: .65rem 1rem; }
+  /* حركة Fade In للنصوص */
+  .fade-in{
+    opacity: 0;
+    animation: fadeIn 2s ease forwards;
+  }
+  .fade-in:nth-child(1){ animation-delay: 0.5s; }
+  .fade-in:nth-child(2){ animation-delay: 1s; }
+  .fade-in:nth-child(3){ animation-delay: 1.5s; }
+
+  @keyframes fadeIn{
+    to{ opacity: 1; }
+  }
+
+  /* حركة Zoom للفيديو */
+  .zoom-video{
+    animation: zoomIn 15s ease-in-out infinite alternate;
+  }
+  @keyframes zoomIn{
+    from{ transform: scale(1); }
+    to{ transform: scale(1.05); }
   }
 </style>
 

@@ -15,7 +15,7 @@
       --danger:#ef4444;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:"Cairo",system-ui}
+    body{margin:0;background:var(--bg);color:var(--text);font-family:"Cairo",system-ui}&
     header.site{
       padding:16px;background:linear-gradient(90deg,var(--primary),var(--accent));
       color:var(--ink);font-weight:900;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap
@@ -59,19 +59,6 @@
 <body>
 
 
-  <!-- قسم الفيديو مع Overlay -->
-<section class="hero-intro">
-  <div class="video-wrapper">
-    <iframe
-      "
-      title="Intro Video"
-      frameborder="0"
-      allow="autoplay; encrypted-media"
-      allowfullscreen
-      loading="lazy">
-    </iframe>
-  </div>
-
   <!-- قسم الفيديو التعريفي -->
 <section class="hero-intro">
   <div class="video-wrapper zoom-video">
@@ -96,61 +83,20 @@
   </div>
 </section>
 
+<!-- قسم البداية اللي الزرار بينزل له -->
+<section id="start" style="padding:100px 20px; background:#f9f9f9;">
+  <h2>🚀 البداية</h2>
+  <p>هنا يبدأ المحتوى الأساسي للمنصة: الأكواد، التجارب، وكل الشرح العملي.</p>
+</section>
+
+<!-- قسم الدليل السريع -->
+<section id="docs" style="padding:100px 20px; background:#fff;">
+  <h2>📖 الدليل السريع</h2>
+  <p>هنا تلاقي خطوات سريعة تساعدك تبدأ مع الأردوينو.</p>
+</section>
+
 <style>
-  :root{
-    --overlay-bg: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 40%, rgba(0,0,0,0.25) 100%);
-    --text-color: #ffffff;
-    --accent: #00d1b2;
-  }
-
-  .hero-intro{
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    background: #000;
-    overflow: hidden;
-  }
-  @supports not (aspect-ratio: 16 / 9){
-    .hero-intro{ padding-bottom: 56.25%; }
-  }
-
-  .video-wrapper{
-    position: absolute;
-    inset: 0;
-  }
-  .video-wrapper iframe{
-    width: 100%;
-    height: 100%;
-  }
-
-  .hero-overlay{
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-color);
-    background: var(--overlay-bg);
-  }
-
-  .hero-title{
-    font-size: clamp(1.6rem, 2.5vw, 3rem);
-    margin: 0 0 .5rem;
-    font-weight: 800;
-  }
-  .hero-subtitle{
-    font-size: clamp(1rem, 1.4vw, 1.3rem);
-    opacity: .9;
-    margin: 0 0 1.25rem;
-  }
-
-  .hero-actions{
-    display: inline-flex;
-    gap: .75rem;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
+  /* نفس التنسيقات السابقة للفيديو والـ Overlay */
   .btn-primary, .btn-secondary{
     text-decoration: none;
     padding: .75rem 1.25rem;
@@ -159,11 +105,10 @@
     transition: transform .15s ease, background .2s ease;
   }
   .btn-primary{
-    background: var(--accent);
+    background: #00d1b2;
     color: #081b1f;
   }
   .btn-primary:hover{ transform: translateY(-2px); }
-
   .btn-secondary{
     background: rgba(255,255,255,.15);
     color: #fff;
@@ -173,30 +118,7 @@
     background: rgba(255,255,255,.25);
     transform: translateY(-2px);
   }
-
-  /* حركة Fade In للنصوص */
-  .fade-in{
-    opacity: 0;
-    animation: fadeIn 2s ease forwards;
-  }
-  .fade-in:nth-child(1){ animation-delay: 0.5s; }
-  .fade-in:nth-child(2){ animation-delay: 1s; }
-  .fade-in:nth-child(3){ animation-delay: 1.5s; }
-
-  @keyframes fadeIn{
-    to{ opacity: 1; }
-  }
-
-  /* حركة Zoom للفيديو */
-  .zoom-video{
-    animation: zoomIn 15s ease-in-out infinite alternate;
-  }
-  @keyframes zoomIn{
-    from{ transform: scale(1); }
-    to{ transform: scale(1.05); }
-  }
 </style>
-
 
 
 
